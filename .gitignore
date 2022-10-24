@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+# Vim tmp
+*.swp
+
+# Vim IDE config
+.vimrc
+
+# Build directory
+cmake-build-*
+
+# YCM
+compile_commands.json
+.cache
