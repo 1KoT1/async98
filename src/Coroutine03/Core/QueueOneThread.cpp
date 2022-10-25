@@ -16,11 +16,22 @@ namespace Coroutine03 {
 			_tasks.push(task);
 		}
 
+		const Task & QueueOneThread::parentTask() const {
+			return *_parentTask;
+		}
+
+		void QueueOneThread::resumeParent() {
+			_resumeParent = true;
+		}
+
 		void QueueOneThread::run() {
 			while(true) {
 				checkSources();
 				while(!_tasks.empty()) {
-					if(_resumeParent) return;
+					if(_resumeParent) {
+						_resumeParent = false;
+						return;
+					}
 					SharedPtr<Task> task = _tasks.front();
 					_tasks.pop();
 					task->run();

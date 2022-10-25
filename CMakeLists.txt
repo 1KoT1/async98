@@ -9,6 +9,9 @@ find_package(Poco 1.7.2 REQUIRED Foundation)
 
 add_library(coroutine03
 	src/Coroutine03/Core/QueueOneThread.cpp
+	src/Coroutine03/Core/SourceEPoll.cpp
+	src/Coroutine03/Core/TaskFD.cpp
+	src/Coroutine03/Core/TaskRoot.cpp
 	)
 
 target_include_directories(coroutine03 PUBLIC

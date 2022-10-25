@@ -14,6 +14,7 @@ namespace Coroutine03 {
 			void add(Poco::SharedPtr<Task> task);
 			void run();
 			void resumeParent();
+			const Task &parentTask() const;
 		private:
 			// Disable copying
 			QueueOneThread(const QueueOneThread &);

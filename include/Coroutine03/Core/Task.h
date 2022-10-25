@@ -6,14 +6,14 @@ namespace Coroutine03 {
 
 		class Task {
 		public:
-			void run();
-			bool isSuspended();
-			bool operator==(const Task &other);
-			void swithContext(const Task &other);
+			Task() {}
+			virtual ~Task() {}
+			void run() {}
+			virtual bool operator==(const Task &other) const = 0;
 		private:
 			// Disable copying
 			Task(const Task &);
-			Task &operator()(const Task &);
+			Task &operator=(const Task &);
 		};
 
 	} // namespace Core
