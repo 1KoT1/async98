@@ -1,4 +1,5 @@
 #ifndef SOURCEEPOLL_H
+#define SOURCEEPOLL_H
 
 #include <map>
 #include "Coroutine03/Core/QueueOneThread.h"
@@ -37,5 +38,4 @@ namespace Coroutine03 {
 } // namespace Coroutine03
 
 
-#define SOURCEEPOLL_H
 #endif // SOURCEEPOLL_H
