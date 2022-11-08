@@ -71,5 +71,21 @@ namespace Coroutine03 {
 			_taskFDCollection[task->fd()] = task;
 		}
 
+		void SourceEPoll::unsubscibe(int fd) {
+			if(epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL) == -1) {
+				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_DEL. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
+			}
+			_taskFDCollection.erase(fd);
+		}
+
+		void SourceEPoll::modifySubscription(int fd, int newEvents) {
+			epoll_event ev;
+			ev.data.fd = fd;
+			ev.events = newEvents;
+			if(epoll_ctl(_epollFd, EPOLL_CTL_MOD, fd, &ev ) == -1) {
+				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_MOD. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
+			}
+		}
+
 	} // namespace Core
 } // namespace Coroutine03

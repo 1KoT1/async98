@@ -24,6 +24,8 @@ namespace Coroutine03 {
 			Poco::Logger &_log;
 
 			void subscibe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
+			void unsubscibe(int fd);
+			void modifySubscription(int fd, int newEvents);
 		};
 
 		class EPollFailException : std::runtime_error {
