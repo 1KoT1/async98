@@ -10,7 +10,7 @@ namespace Coroutine03 {
 
 		class QueueOneThread {
 		public:
-			QueueOneThread(Poco::SharedPtr<Task> &parentTask);
+			QueueOneThread(const Poco::SharedPtr<Task> &parentTask);
 			void add(Poco::SharedPtr<Task> task);
 			void run();
 			void resumeParent();

@@ -6,7 +6,7 @@ using Poco::SharedPtr;
 namespace Coroutine03 {
 	namespace Core {
 
-		QueueOneThread::QueueOneThread(SharedPtr<Task> &parentTask)
+		QueueOneThread::QueueOneThread(const SharedPtr<Task> &parentTask)
 			: _tasks()
 			, _parentTask(parentTask)
 			, _resumeParent(false)
