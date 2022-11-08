@@ -18,15 +18,15 @@ namespace Coroutine03 {
 			SourceEPoll(const Poco::SharedPtr<QueueOneThread> &queue);
 			~SourceEPoll();
 			void checkIO();
+
+			void subscribe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
+			void unsubscribe(int fd);
+			void modifySubscription(int fd, int newEvents);
 		private:
 			Poco::SharedPtr<QueueOneThread> _queue;
 			int _epollFd;
 			std::map<int, Poco::SharedPtr<TaskFD> > _taskFDCollection;
 			Poco::Logger &_log;
-
-			void subscribe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
-			void unsubscribe(int fd);
-			void modifySubscription(int fd, int newEvents);
 		};
 
 		class EPollFailException : std::runtime_error {
