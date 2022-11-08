@@ -24,8 +24,8 @@ namespace Coroutine03 {
 			std::map<int, Poco::SharedPtr<TaskFD> > _taskFDCollection;
 			Poco::Logger &_log;
 
-			void subscibe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
-			void unsubscibe(int fd);
+			void subscribe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
+			void unsubscribe(int fd);
 			void modifySubscription(int fd, int newEvents);
 		};
 

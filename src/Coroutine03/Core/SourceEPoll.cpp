@@ -59,7 +59,7 @@ namespace Coroutine03 {
 			}
 		}
 
-		void SourceEPoll::subscibe(const SharedPtr<TaskFD> &task, int events) {
+		void SourceEPoll::subscribe(const SharedPtr<TaskFD> &task, int events) {
 			epoll_event ev;
 			ev.data.fd = task->fd();
 			ev.events = events;
@@ -71,7 +71,7 @@ namespace Coroutine03 {
 			_taskFDCollection[task->fd()] = task;
 		}
 
-		void SourceEPoll::unsubscibe(int fd) {
+		void SourceEPoll::unsubscribe(int fd) {
 			if(epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL) == -1) {
 				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_DEL. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
