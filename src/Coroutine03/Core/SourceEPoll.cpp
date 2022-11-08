@@ -1,25 +1,37 @@
 #include "Coroutine03/Core/SourceEPoll.h"
-#include "Coroutine03/Core/TaskFD.h"
 #include <cstring>
 #include <Poco/Format.h>
 #include <Poco/Logger.h>
-#include <Poco/SharedPtr.h>
 #include <sys/epoll.h>
 #include <unistd.h>
 
 using Poco::format;
 using Poco::Logger;
 using Poco::SharedPtr;
-using std::map;
 using std::string;
 
 namespace Coroutine03 {
 	namespace Core {
 
-		SourceEPoll::SourceEPoll(const SharedPtr<QueueOneThread> &queue)
-			: _queue(queue)
-			, _epollFd(epoll_create1(EPOLL_CLOEXEC))
-			, _taskFDCollection()
+		Events::Events(int size)
+			: _size(size)
+			, _data(new struct epoll_event[size])
+		{}
+
+		Events::~Events() {
+			delete [] _data;
+		}
+
+		struct epoll_event *Events::data() {
+			return _data;
+		}
+
+		int Events::size() const {
+			return _size;
+		}
+
+		SourceEPoll::SourceEPoll()
+			: _epollFd(epoll_create1(EPOLL_CLOEXEC))
 			, _log(Logger::root())
 		{
 			if(_epollFd == -1) {
@@ -36,46 +48,31 @@ namespace Coroutine03 {
 		}
 
 		const int infinite = -1;
-		const int MAX_EVENTS = 10;
 
-		void SourceEPoll::checkIO() {
-			struct epoll_event events[MAX_EVENTS];
-			int n = epoll_wait(_epollFd, events, MAX_EVENTS, infinite);
+		void SourceEPoll::wait(Events &events) {
+			int n = epoll_wait(_epollFd, events.data(), events.size(), infinite);
 			if(n == -1) {
 				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 			if(n == 0) {
 				poco_error(_log, "Fail of the epoll_wait method: Unexpected elapse timeout.");
-			} else {
-				for(int i = 0; i != n; ++i) {
-					SharedPtr<TaskFD> eventHappenedTask = _taskFDCollection.at(events[i].data.fd);
-					eventHappenedTask->setCurrentEvents(events[i].events);
-					if(_queue->parentTask() == *eventHappenedTask) {
-						_queue->resumeParent();
-					} else {
-						_queue->add(eventHappenedTask);
-					}
-				}
 			}
 		}
 
-		void SourceEPoll::subscribe(const SharedPtr<TaskFD> &task, int events) {
+		void SourceEPoll::subscribe(int fd, int events) {
 			epoll_event ev;
-			ev.data.fd = task->fd();
+			ev.data.fd = fd;
 			ev.events = events;
 
-			if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, task->fd(), &ev)) {
+			if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, fd, &ev)) {
 				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_ADD. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
-
-			_taskFDCollection[task->fd()] = task;
 		}
 
 		void SourceEPoll::unsubscribe(int fd) {
 			if(epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL) == -1) {
 				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_DEL. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
-			_taskFDCollection.erase(fd);
 		}
 
 		void SourceEPoll::modifySubscription(int fd, int newEvents) {

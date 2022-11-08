@@ -1,31 +1,38 @@
 #ifndef SOURCEEPOLL_H
 #define SOURCEEPOLL_H
 
-#include <map>
 #include "Coroutine03/Core/QueueOneThread.h"
-#include "Coroutine03/Core/TaskFD.h"
 #include <exception>
-#include <Poco/SharedPtr.h>
 #include <stdexcept>
+#include <sys/epoll.h>
 
 namespace Poco { class Logger; }
 
 namespace Coroutine03 {
 	namespace Core {
 
+		class Events {
+		public:
+			Events(int size);
+			~Events();
+			struct epoll_event *data();
+			int size() const;
+		private:
+			int _size;
+			struct epoll_event *_data;
+		};
+
 		class SourceEPoll {
 		public:
-			SourceEPoll(const Poco::SharedPtr<QueueOneThread> &queue);
+			SourceEPoll();
 			~SourceEPoll();
-			void checkIO();
+			void wait(Events &happenedEvents);
 
-			void subscribe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
+			void subscribe(int fd, int events);
 			void unsubscribe(int fd);
 			void modifySubscription(int fd, int newEvents);
 		private:
-			Poco::SharedPtr<QueueOneThread> _queue;
 			int _epollFd;
-			std::map<int, Poco::SharedPtr<TaskFD> > _taskFDCollection;
 			Poco::Logger &_log;
 		};
 
