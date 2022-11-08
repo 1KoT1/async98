@@ -1,9 +1,11 @@
-#include <stdexcept>
 #ifndef SOURCEEPOLL_H
 
+#include <map>
 #include "Coroutine03/Core/QueueOneThread.h"
+#include "Coroutine03/Core/TaskFD.h"
 #include <exception>
 #include <Poco/SharedPtr.h>
+#include <stdexcept>
 
 namespace Poco { class Logger; }
 
@@ -14,11 +16,14 @@ namespace Coroutine03 {
 		public:
 			SourceEPoll(const Poco::SharedPtr<QueueOneThread> &queue);
 			~SourceEPoll();
-			void checIO();
+			void checkIO();
 		private:
 			Poco::SharedPtr<QueueOneThread> _queue;
 			int _epollFd;
+			std::map<int, Poco::SharedPtr<TaskFD> > _taskFDCollection;
 			Poco::Logger &_log;
+
+			void subscibe(const Poco::SharedPtr<TaskFD> &taskFD, int events);
 		};
 
 		class EPollFailException : std::runtime_error {

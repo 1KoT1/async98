@@ -10,6 +10,7 @@
 using Poco::format;
 using Poco::Logger;
 using Poco::SharedPtr;
+using std::map;
 using std::string;
 
 namespace Coroutine03 {
@@ -17,8 +18,9 @@ namespace Coroutine03 {
 
 		SourceEPoll::SourceEPoll(const SharedPtr<QueueOneThread> &queue)
 			: _queue(queue)
-				, _epollFd(epoll_create1(EPOLL_CLOEXEC))
-				 , _log(Logger::root())
+			, _epollFd(epoll_create1(EPOLL_CLOEXEC))
+			, _taskFDCollection()
+			, _log(Logger::root())
 		{
 			if(_epollFd == -1) {
 				throw EPollFailException(format("Fail of the epoll_create1 method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
@@ -36,7 +38,7 @@ namespace Coroutine03 {
 		const int infinite = -1;
 		const int MAX_EVENTS = 10;
 
-		void SourceEPoll::checIO() {
+		void SourceEPoll::checkIO() {
 			struct epoll_event events[MAX_EVENTS];
 			int n = epoll_wait(_epollFd, events, MAX_EVENTS, infinite);
 			if(n == -1) {
@@ -46,15 +48,27 @@ namespace Coroutine03 {
 				poco_error(_log, "Fail of the epoll_wait method: Unexpected elapse timeout.");
 			} else {
 				for(int i = 0; i != n; ++i) {
-					SharedPtr<TaskFD> handlerObj = *static_cast<SharedPtr<TaskFD>*>(events[i].data.ptr);
-					handlerObj->setCurrentEvents(events[i].events);
-					if(_queue->parentTask() == *handlerObj) {
+					SharedPtr<TaskFD> eventHappenedTask = _taskFDCollection.at(events[i].data.fd);
+					eventHappenedTask->setCurrentEvents(events[i].events);
+					if(_queue->parentTask() == *eventHappenedTask) {
 						_queue->resumeParent();
 					} else {
-						_queue->add(handlerObj);
+						_queue->add(eventHappenedTask);
 					}
 				}
 			}
+		}
+
+		void SourceEPoll::subscibe(const SharedPtr<TaskFD> &task, int events) {
+			epoll_event ev;
+			ev.data.fd = task->fd();
+			ev.events = events;
+
+			if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, task->fd(), &ev)) {
+				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_ADD. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
+			}
+
+			_taskFDCollection[task->fd()] = task;
 		}
 
 	} // namespace Core
