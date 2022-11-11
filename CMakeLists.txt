@@ -8,9 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Poco 1.7.2 REQUIRED Foundation)
 
 add_library(coroutine03
-	src/Coroutine03/Core/EPoll.cpp
-	src/Coroutine03/Core/TaskFD.cpp
 	src/Coroutine03/Core/DispatcherEPoll.cpp
+	src/Coroutine03/Core/EPoll.cpp
+	src/Coroutine03/Core/SocketUdp.cpp
+	src/Coroutine03/Core/TaskFD.cpp
 	)
 
 target_include_directories(coroutine03 PUBLIC
