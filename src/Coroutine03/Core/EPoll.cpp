@@ -1,4 +1,4 @@
-#include "Coroutine03/Core/SourceEPoll.h"
+#include "Coroutine03/Core/EPoll.h"
 #include <cstring>
 #include <Poco/Format.h>
 #include <Poco/Logger.h>
@@ -7,30 +7,12 @@
 
 using Poco::format;
 using Poco::Logger;
-using Poco::SharedPtr;
 using std::string;
 
 namespace Coroutine03 {
 	namespace Core {
 
-		Events::Events(int size)
-			: _size(size)
-			, _data(new struct epoll_event[size])
-		{}
-
-		Events::~Events() {
-			delete [] _data;
-		}
-
-		struct epoll_event *Events::data() {
-			return _data;
-		}
-
-		int Events::size() const {
-			return _size;
-		}
-
-		SourceEPoll::SourceEPoll()
+		EPoll::EPoll()
 			: _epollFd(epoll_create1(EPOLL_CLOEXEC))
 			, _log(Logger::root())
 		{
@@ -39,7 +21,7 @@ namespace Coroutine03 {
 			}
 		}
 
-		SourceEPoll::~SourceEPoll() {
+		EPoll::~EPoll() {
 			if(_epollFd != -1) {
 				if(close(_epollFd) == -1) {
 					poco_error_f2(_log, "Fail of close the epoll fd. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0))));
@@ -47,19 +29,28 @@ namespace Coroutine03 {
 			}
 		}
 
-		const int infinite = -1;
+		int EPoll::wait(struct epoll_event *events, int maxevents, Timeout timeout) {
+			int n = epoll_wait(_epollFd, events, maxevents, timeout.totalMilliseconds());
+			if(n == -1) {
+				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
+			}
+			return n;
+		}
 
-		void SourceEPoll::wait(Events &events) {
-			int n = epoll_wait(_epollFd, events.data(), events.size(), infinite);
+		const int INFINITE = -1;
+
+		int EPoll::wait(struct epoll_event *events, int maxevents) {
+			int n = epoll_wait(_epollFd, events, maxevents, INFINITE);
 			if(n == -1) {
 				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 			if(n == 0) {
-				poco_error(_log, "Fail of the epoll_wait method: Unexpected elapse timeout.");
+				throw EPollFailException("Fail of the epoll_wait method: Unexpected elapse timeout.");
 			}
+			return n;
 		}
 
-		void SourceEPoll::subscribe(int fd, int events) {
+		void EPoll::add(int fd, int events) {
 			epoll_event ev;
 			ev.data.fd = fd;
 			ev.events = events;
@@ -69,13 +60,13 @@ namespace Coroutine03 {
 			}
 		}
 
-		void SourceEPoll::unsubscribe(int fd) {
+		void EPoll::del(int fd) {
 			if(epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL) == -1) {
 				throw EPollFailException(format("Fail of the epoll_ctl method. EPOLL_CTL_DEL. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 		}
 
-		void SourceEPoll::modifySubscription(int fd, int newEvents) {
+		void EPoll::mod(int fd, int newEvents) {
 			epoll_event ev;
 			ev.data.fd = fd;
 			ev.events = newEvents;
