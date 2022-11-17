@@ -10,7 +10,6 @@
 
 using Poco::format;
 using Poco::Net::SocketAddress;
-using Poco::Optional;
 using Poco::SharedPtr;
 using std::runtime_error;
 using std::string;
