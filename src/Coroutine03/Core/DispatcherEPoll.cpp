@@ -1,7 +1,11 @@
 #include "Coroutine03/Core/DicpatcherEPoll.h"
+#include <Poco/Timespan.h>
+#include <Poco/Timestamp.h>
 #include <string>
 
 using Poco::Optional;
+using Poco::Timespan;
+using Poco::Timestamp;
 using std::string;
 
 namespace Coroutine03 {
@@ -23,12 +27,17 @@ namespace Coroutine03 {
 			return Optional<EPoll::Events>();
 		}
 
+		inline Timestamp now() { 
+			return Timestamp(); // Current time;
+		}
+
 		Optional<EPoll::Events> DispatcherEPoll::wait(int currentFd, Timeout timeout) {
 			struct epoll_event events[MAX_EVENTS];
-			while (true) {
-				int happened = _epoll.wait(events, MAX_EVENTS, timeout);
+			Timestamp startTime; // Current time.
+			for(Timespan nextTimeout = timeout; nextTimeout > 0; nextTimeout -= (now() - startTime)) {
+				int happened = _epoll.wait(events, MAX_EVENTS, nextTimeout);
 				if(happened == 0) {
-					return Optional<EPoll::Events>();
+					return Optional<EPoll::Events>(); // Empty.
 				}
 
 				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd);
@@ -40,6 +49,7 @@ namespace Coroutine03 {
 					_tasks[events[i].data.fd]->run(events[i].events);
 				}
 			}
+			return Optional<EPoll::Events>(); // Empty.
 		}
 
 	} // namespace Core
