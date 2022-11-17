@@ -67,11 +67,11 @@ namespace Coroutine03 {
 			}
 		}
 
-		Timeouted SocketUdp::send(const BufferRef &buffer, Timeout timeout) {
+		void SocketUdp::send(const BufferRef &buffer, Timeout timeout) {
 			while(true) {
 				Optional<EPoll::Events> events = _dispatcher->wait(fd(), timeout);
 				if(!events.isSpecified()) {
-					return Timedout;
+					throw TimeoutException("Fail of send data to udp socket by timeout.");
 				}
 				if(events.value() & EPOLLERR) {
 					throw runtime_error(format("Fail of send data to udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
@@ -85,14 +85,13 @@ namespace Coroutine03 {
 			if(err == -1) {
 				throw runtime_error(format("Fail of send data to udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
-			return Success;
 		}
 
-		Timeouted SocketUdp::recv(BufferRef &buffer, Timeout timeout) {
+		void SocketUdp::recv(BufferRef &buffer, Timeout timeout) {
 			while(true) {
 				Optional<EPoll::Events> events = _dispatcher->wait(fd(), timeout);
 				if(!events.isSpecified()) {
-					return Timedout;
+					throw TimeoutException("Fail of receive data from udp socket by timeout.");
 				}
 				if(events.value() & EPOLLERR) {
 					throw runtime_error(format("Fail of receive data from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
@@ -106,7 +105,6 @@ namespace Coroutine03 {
 			if(err == -1) {
 				throw runtime_error(format("Fail of receive data from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
-			return Success;
 		}
 
 	} // namespace Core

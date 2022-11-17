@@ -5,9 +5,16 @@
 #include "Coroutine03/Core/TaskFD.h"
 #include "Poco/BasicEvent.h"
 #include <Poco/Net/SocketAddress.h>
+#include <stdexcept>
+#include <string>
 
 namespace Coroutine03 {
 	namespace Core {
+
+		class TimeoutException : std::runtime_error {
+		public:
+			TimeoutException(const std::string &message) : std::runtime_error(message) {}
+		};
 
 		class BufferRef {
 		public:
@@ -20,11 +27,6 @@ namespace Coroutine03 {
 			size_t _size;
 		};
 
-		enum Timeouted {
-			Success,
-			Timedout
-		};
-
 		class SocketUdp : public TaskFD {
 		public:
 			SocketUdp(Poco::SharedPtr<DispatcherEPoll> dispatcher, size_t bufSize = 1024);
@@ -35,8 +37,8 @@ namespace Coroutine03 {
 
 			void connect(const Poco::Net::SocketAddress &address);
 			void bind(const Poco::Net::SocketAddress &address);
-			Timeouted send(const BufferRef &buffer, Timeout timeout);
-			Timeouted recv(BufferRef &bufferForRecv, Timeout timeout);
+			void send(const BufferRef &buffer, Timeout timeout);
+			void recv(BufferRef &bufferForRecv, Timeout timeout);
 
 			Poco::BasicEvent<const BufferRef> packetReceived;
 		private:
