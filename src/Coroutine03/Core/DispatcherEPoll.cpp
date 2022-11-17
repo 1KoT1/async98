@@ -18,9 +18,9 @@ namespace Coroutine03 {
 			_epoll.add(task->fd(), task->interestedEvents());
 		}
 
-		inline Optional<EPoll::Events> find(const epoll_event *events, int eventsSize, int currentFd) {
+		inline Optional<EPoll::Events> find(const epoll_event *events, int eventsSize, int currentFd, EPoll::Events eventsMask) {
 			for(int i = 0; i < eventsSize; ++i) {
-				if(events[i].data.fd == eventsSize) {
+				if(events[i].data.fd == eventsSize && events[i].events & eventsMask) {
 					return events[i].events;
 				}
 			}
@@ -31,7 +31,7 @@ namespace Coroutine03 {
 			return Timestamp(); // Current time;
 		}
 
-		EPoll::Events DispatcherEPoll::wait(int currentFd, Timeout timeout) {
+		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask, Timeout timeout) {
 			struct epoll_event events[MAX_EVENTS];
 			Timestamp startTime; // Current time.
 			for(Timespan nextTimeout = timeout; nextTimeout > 0; nextTimeout -= (now() - startTime)) {
@@ -40,7 +40,7 @@ namespace Coroutine03 {
 					return 0; // Timedout
 				}
 
-				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd);
+				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd, eventsMask);
 				if(eventsForCurrent.isSpecified()) {
 					return eventsForCurrent.value();
 				}

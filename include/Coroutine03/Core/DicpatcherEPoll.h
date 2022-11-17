@@ -22,10 +22,11 @@ namespace Coroutine03 {
 			 * Exit when events happened on interested file descriptor.
 			 * 
 			 * \param currentFd an interested file descriptor for wait events.
+			 * \param eventMask is filter for events on interested fd. Exit only for events are matched by this mask.
 			 * \param timeout is time for wait events. If time is spended exit with 0 value.
 			 * \return Flags of happened events or 0 on timeout.
 			 */
-			EPoll::Events wait(int interestedFd, Timeout timeout);
+			EPoll::Events wait(int currentFd, EPoll::Events eventsMask, Timeout timeout);
 		private:
 			EPoll _epoll;
 			std::map<int, TaskFD*> _tasks;

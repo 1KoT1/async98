@@ -68,17 +68,16 @@ namespace Coroutine03 {
 		}
 
 		void SocketUdp::send(const BufferRef &buffer, Timeout timeout) {
-			while(true) {
-				EPoll::Events events = _dispatcher->wait(fd(), timeout);
-				if(events == 0) {
-					throw TimeoutException("Fail of send data to udp socket by timeout.");
-				}
-				if(events & EPOLLERR) {
-					throw runtime_error(format("Fail of send data to udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-				}
-				if(events & EPOLLOUT) {
-					break;
-				}
+			EPoll::Events events = _dispatcher->wait(
+				fd(),
+				EPOLLOUT | EPOLLERR,
+				timeout
+				);
+			if(events == 0) {
+				throw TimeoutException("Fail of send data to udp socket by timeout.");
+			}
+			if(events & EPOLLERR) {
+				throw runtime_error(format("Fail of send data to udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 
 			int err = ::send(fd(), buffer.data(), buffer.size(), NO_FLAGS);
@@ -88,17 +87,16 @@ namespace Coroutine03 {
 		}
 
 		void SocketUdp::recv(BufferRef &buffer, Timeout timeout) {
-			while(true) {
-				EPoll::Events events = _dispatcher->wait(fd(), timeout);
-				if(events == 0) {
-					throw TimeoutException("Fail of receive data from udp socket by timeout.");
-				}
-				if(events & EPOLLERR) {
-					throw runtime_error(format("Fail of receive data from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-				}
-				if(events & EPOLLIN) {
-					break;
-				}
+			EPoll::Events events = _dispatcher->wait(
+				fd(),
+				EPOLLIN | EPOLLERR,
+			 	timeout
+				);
+			if(events == 0) {
+				throw TimeoutException("Fail of receive data from udp socket by timeout.");
+			}
+			if(events & EPOLLERR) {
+				throw runtime_error(format("Fail of receive data from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 
 			int err = ::recv(fd(), buffer.data(), buffer.size(), NO_FLAGS);
