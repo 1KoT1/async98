@@ -1,9 +1,9 @@
 #ifndef DICPATCHEREPOLL_H
 #define DICPATCHEREPOLL_H
 
-#include "Coroutine03/Core/TaskFD.h"
 #include "Coroutine03/Core/Timeout.h"
 #include "EPoll.h"
+#include <Poco/SharedPtr.h>
 #include <map>
 #include <Poco/Optional.h>
 
@@ -12,7 +12,14 @@ namespace Coroutine03 {
 
 		class DispatcherEPoll {
 		public:
-			void subscribe(TaskFD *task);
+			class Handler {
+			public:
+				virtual void run(EPoll::Events events) = 0;
+				virtual ~Handler(){}
+			};
+
+			void subscribe(int fd, EPoll::Events interestedEvents, Poco::SharedPtr<Handler> handler);
+			void unsubscribe(int fd);
 			void run();
 
 			/** \brief Wait while some events on file descriptor.
@@ -29,7 +36,7 @@ namespace Coroutine03 {
 			EPoll::Events wait(int currentFd, EPoll::Events eventsMask, Timeout timeout);
 		private:
 			EPoll _epoll;
-			std::map<int, TaskFD*> _tasks;
+			std::map<int, Poco::SharedPtr<Handler> > _handlers;
 		};
 
 	} // namespace Core

@@ -1,8 +1,7 @@
 #ifndef SOCKETUDP_H
 #define SOCKETUDP_H
 
-#include "Coroutine03/Core/DicpatcherEPoll.h"
-#include "Coroutine03/Core/TaskFD.h"
+#include "Coroutine03/Core/HandlerEPollEvents.h"
 #include "Poco/BasicEvent.h"
 #include <Poco/Net/SocketAddress.h>
 #include <stdexcept>
@@ -27,13 +26,10 @@ namespace Coroutine03 {
 			size_t _size;
 		};
 
-		class SocketUdp : public TaskFD {
+		class SocketUdp : public HandlerEPollEvents {
 		public:
 			SocketUdp(Poco::SharedPtr<DispatcherEPoll> dispatcher, size_t bufSize = 1024);
 			~SocketUdp();
-
-			int interestedEvents() const;
-			void run(int epollEvents);
 
 			void connect(const Poco::Net::SocketAddress &address);
 			void bind(const Poco::Net::SocketAddress &address);
@@ -41,10 +37,12 @@ namespace Coroutine03 {
 			void recv(BufferRef &bufferForRecv, Timeout timeout);
 
 			Poco::BasicEvent<const BufferRef> packetReceived;
+
+		protected:
+			void handler(EPoll::Events events);
 		private:
 			char *_buf;
 			size_t _bufSize;
-			Poco::SharedPtr<DispatcherEPoll> _dispatcher;
 
 			// Disable copying
 			SocketUdp(const SocketUdp &);

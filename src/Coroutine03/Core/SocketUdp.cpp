@@ -27,24 +27,21 @@ namespace Coroutine03 {
 			return fd;
 		}
 
+		const int UDP_INTERESTED_EVENTS = EPOLLIN | EPOLLOUT | EPOLLERR;
+
 		SocketUdp::SocketUdp(SharedPtr<DispatcherEPoll> dispatcher, size_t bufSize)
-			: TaskFD(createSocket())
+			: HandlerEPollEvents(dispatcher, createSocket(), UDP_INTERESTED_EVENTS)
 			, _buf(new char[bufSize])
 			, _bufSize(bufSize)
-			, _dispatcher(dispatcher)
 		{}
 
 		SocketUdp::~SocketUdp() {
 			delete [] _buf;
 		}
 
-		const int UDP_INTERESTED_EVENTS = EPOLLIN | EPOLLOUT | EPOLLERR;
-
-		int SocketUdp::interestedEvents() const { return UDP_INTERESTED_EVENTS; }
-
-		void SocketUdp::run(int epollEvents) {
-			if(epollEvents & EPOLLIN) {
-				int n = ::recv(fd(), _buf, _bufSize, NO_FLAGS);
+		void SocketUdp::handler(EPoll::Events events) {
+			if(events & EPOLLIN) {
+				int n = ::recv(_fd, _buf, _bufSize, NO_FLAGS);
 				if(n == -1) {
 					throw runtime_error(format("Fail of recv from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 				}
@@ -53,14 +50,14 @@ namespace Coroutine03 {
 		}
 
 		void SocketUdp::connect(const SocketAddress &address) {
-			int err = ::connect(fd(), address.addr(), address.length());
+			int err = ::connect(_fd, address.addr(), address.length());
 			if(err == -1) {
 				throw runtime_error(format("Fail of connect udp socket to address %s. Errno: %d, %s", address.toString(), errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 		}
 
 		void SocketUdp::bind(const SocketAddress &address) {
-			int err = ::bind(fd(), address.addr(), address.length());
+			int err = ::bind(_fd, address.addr(), address.length());
 			if(err == -1) {
 				throw runtime_error(format("Fail of bind udp socket to address %s. Errno: %d, %s", address.toString(), errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
@@ -68,7 +65,7 @@ namespace Coroutine03 {
 
 		void SocketUdp::send(const BufferRef &buffer, Timeout timeout) {
 			EPoll::Events events = _dispatcher->wait(
-				fd(),
+				_fd,
 				EPOLLOUT | EPOLLERR,
 				timeout
 				);
@@ -79,7 +76,7 @@ namespace Coroutine03 {
 				throw runtime_error(format("Fail of send data to udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 
-			int err = ::send(fd(), buffer.data(), buffer.size(), NO_FLAGS);
+			int err = ::send(_fd, buffer.data(), buffer.size(), NO_FLAGS);
 			if(err == -1) {
 				throw runtime_error(format("Fail of send data to udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
@@ -87,7 +84,7 @@ namespace Coroutine03 {
 
 		void SocketUdp::recv(BufferRef &buffer, Timeout timeout) {
 			EPoll::Events events = _dispatcher->wait(
-				fd(),
+				_fd,
 				EPOLLIN | EPOLLERR,
 			 	timeout
 				);
@@ -98,7 +95,7 @@ namespace Coroutine03 {
 				throw runtime_error(format("Fail of receive data from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}
 
-			int err = ::recv(fd(), buffer.data(), buffer.size(), NO_FLAGS);
+			int err = ::recv(_fd, buffer.data(), buffer.size(), NO_FLAGS);
 			if(err == -1) {
 				throw runtime_error(format("Fail of receive data from udp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
 			}

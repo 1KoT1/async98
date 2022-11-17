@@ -1,9 +1,11 @@
 #include "Coroutine03/Core/DicpatcherEPoll.h"
+#include <Poco/SharedPtr.h>
 #include <Poco/Timespan.h>
 #include <Poco/Timestamp.h>
 #include <string>
 
 using Poco::Optional;
+using Poco::SharedPtr;
 using Poco::Timespan;
 using Poco::Timestamp;
 using std::string;
@@ -13,9 +15,14 @@ namespace Coroutine03 {
 
 		const int MAX_EVENTS = 10;
 
-		void DispatcherEPoll::subscribe(TaskFD *task) {
-			_tasks[task->fd()] = task;
-			_epoll.add(task->fd(), task->interestedEvents());
+		void DispatcherEPoll::subscribe(int fd, EPoll::Events interestedEvents, SharedPtr<Handler> handler) {
+			_handlers[fd] = handler;
+			_epoll.add(fd, interestedEvents);
+		}
+
+		void DispatcherEPoll::unsubscribe(int fd) {
+			_handlers.erase(fd);
+			_epoll.del(fd);
 		}
 
 		inline Optional<EPoll::Events> find(const epoll_event *events, int eventsSize, int currentFd, EPoll::Events eventsMask) {
@@ -46,7 +53,7 @@ namespace Coroutine03 {
 				}
 
 				for(int i = 0; i < happened; ++i) {
-					_tasks[events[i].data.fd]->run(events[i].events);
+					_handlers[events[i].data.fd]->run(events[i].events);
 				}
 			}
 			return 0; // Timedout
