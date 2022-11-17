@@ -31,25 +31,25 @@ namespace Coroutine03 {
 			return Timestamp(); // Current time;
 		}
 
-		Optional<EPoll::Events> DispatcherEPoll::wait(int currentFd, Timeout timeout) {
+		EPoll::Events DispatcherEPoll::wait(int currentFd, Timeout timeout) {
 			struct epoll_event events[MAX_EVENTS];
 			Timestamp startTime; // Current time.
 			for(Timespan nextTimeout = timeout; nextTimeout > 0; nextTimeout -= (now() - startTime)) {
 				int happened = _epoll.wait(events, MAX_EVENTS, nextTimeout);
 				if(happened == 0) {
-					return Optional<EPoll::Events>(); // Empty.
+					return 0; // Timedout
 				}
 
 				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd);
 				if(eventsForCurrent.isSpecified()) {
-					return eventsForCurrent;
+					return eventsForCurrent.value();
 				}
 
 				for(int i = 0; i < happened; ++i) {
 					_tasks[events[i].data.fd]->run(events[i].events);
 				}
 			}
-			return Optional<EPoll::Events>(); // Empty.
+			return 0; // Timedout
 		}
 
 	} // namespace Core
