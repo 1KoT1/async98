@@ -15,7 +15,17 @@ namespace Coroutine03 {
 			void subscribe(TaskFD *task);
 			void run();
 
-			Poco::Optional<EPoll::Events> wait(int fd, Timeout timeout);
+			/** \brief Wait while some events on file descriptor.
+			 * 
+			 * Execute handlers for events on other file descriptors while
+			 * wait events on interested file descriptor.
+			 * Exit when events happened on interested file descriptor.
+			 * 
+			 * \param currentFd an interested file descriptor for wait events.
+			 * \param timeout is time for wait events. If time is spended exit with empty value.
+			 * \return Flags of happened events or empty on timeout.
+			 */
+			Poco::Optional<EPoll::Events> wait(int interestedFd, Timeout timeout);
 		private:
 			EPoll _epoll;
 			std::map<int, TaskFD*> _tasks;
