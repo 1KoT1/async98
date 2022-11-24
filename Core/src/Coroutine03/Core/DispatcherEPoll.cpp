@@ -59,5 +59,21 @@ namespace Coroutine03 {
 			return 0; // Timedout
 		}
 
+		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask) {
+			struct epoll_event events[MAX_EVENTS];
+			while(true) {
+				int happened = _epoll.wait(events, MAX_EVENTS);
+
+				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd, eventsMask);
+				if(eventsForCurrent.isSpecified()) {
+					return eventsForCurrent.value();
+				}
+
+				for(int i = 0; i < happened; ++i) {
+					_handlers[events[i].data.fd]->run(events[i].events);
+				}
+			}
+		}
+
 	} // namespace Core
 } // namespace Coroutine03
