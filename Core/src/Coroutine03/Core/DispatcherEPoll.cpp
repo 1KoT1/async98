@@ -47,7 +47,7 @@ namespace Coroutine03 {
 					return 0; // Timedout
 				}
 
-				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd, eventsMask);
+				Optional<EPoll::Events> eventsForCurrent = find(events, happened, currentFd, eventsMask);
 				if(eventsForCurrent.isSpecified()) {
 					return eventsForCurrent.value();
 				}
@@ -64,7 +64,7 @@ namespace Coroutine03 {
 			while(true) {
 				int happened = _epoll.wait(events, MAX_EVENTS);
 
-				Optional<EPoll::Events> eventsForCurrent = find(events, MAX_EVENTS, currentFd, eventsMask);
+				Optional<EPoll::Events> eventsForCurrent = find(events, happened, currentFd, eventsMask);
 				if(eventsForCurrent.isSpecified()) {
 					return eventsForCurrent.value();
 				}
