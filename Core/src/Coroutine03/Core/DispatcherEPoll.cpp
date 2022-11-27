@@ -27,7 +27,7 @@ namespace Coroutine03 {
 
 		inline Optional<EPoll::Events> find(const epoll_event *events, int eventsSize, int currentFd, EPoll::Events eventsMask) {
 			for(int i = 0; i < eventsSize; ++i) {
-				if(events[i].data.fd == eventsSize && events[i].events & eventsMask) {
+				if(events[i].data.fd == currentFd && events[i].events & eventsMask) {
 					return events[i].events;
 				}
 			}
