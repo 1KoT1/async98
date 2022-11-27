@@ -43,3 +43,7 @@ cmake-build-*
 # YCM
 compile_commands.json
 .cache
+
+# Vimspector
+.vimspector.json
+**/.vimspector.json
