@@ -13,6 +13,10 @@ using std::string;
 namespace Coroutine03 {
 	namespace Core {
 
+		DispatcherEPoll::DispatcherEPoll()
+			: _isStarted(true)
+		{}
+
 		const int MAX_EVENTS = 10;
 
 		void DispatcherEPoll::subscribe(int fd, EPoll::Events interestedEvents, SharedPtr<Handler> handler) {
@@ -23,6 +27,10 @@ namespace Coroutine03 {
 		void DispatcherEPoll::unsubscribe(int fd) {
 			_handlers.erase(fd);
 			_epoll.del(fd);
+		}
+
+		void DispatcherEPoll::stop() {
+			_isStarted = false;
 		}
 
 		inline Optional<EPoll::Events> find(const epoll_event *events, int eventsSize, int currentFd, EPoll::Events eventsMask) {
@@ -43,6 +51,10 @@ namespace Coroutine03 {
 			Timestamp startTime; // Current time.
 			for(Timespan nextTimeout = timeout; nextTimeout > 0; nextTimeout -= (now() - startTime)) {
 				int happened = _epoll.wait(events, MAX_EVENTS, nextTimeout);
+				if(!_isStarted) {
+					throw CanceledException();
+				}
+
 				if(happened == 0) {
 					return 0; // Timedout
 				}
@@ -54,6 +66,9 @@ namespace Coroutine03 {
 
 				for(int i = 0; i < happened; ++i) {
 					_handlers[events[i].data.fd]->run(events[i].events);
+					if(!_isStarted) {
+						throw CanceledException();
+					}
 				}
 			}
 			return 0; // Timedout
@@ -63,6 +78,9 @@ namespace Coroutine03 {
 			struct epoll_event events[MAX_EVENTS];
 			while(true) {
 				int happened = _epoll.wait(events, MAX_EVENTS);
+				if(!_isStarted) {
+					throw CanceledException();
+				}
 
 				Optional<EPoll::Events> eventsForCurrent = find(events, happened, currentFd, eventsMask);
 				if(eventsForCurrent.isSpecified()) {
@@ -71,6 +89,9 @@ namespace Coroutine03 {
 
 				for(int i = 0; i < happened; ++i) {
 					_handlers[events[i].data.fd]->run(events[i].events);
+					if(!_isStarted) {
+						throw CanceledException();
+					}
 				}
 			}
 		}

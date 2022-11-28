@@ -6,6 +6,7 @@
 #include <Poco/SharedPtr.h>
 #include <map>
 #include <Poco/Optional.h>
+#include <stdexcept>
 
 namespace Coroutine03 {
 	namespace Core {
@@ -17,10 +18,17 @@ namespace Coroutine03 {
 				virtual void run(EPoll::Events events) = 0;
 				virtual ~Handler(){}
 			};
+			class CanceledException : public std::runtime_error {
+			public:
+				CanceledException() : std::runtime_error("The events dispatcher was stopped.") {}
+			};
+
+			DispatcherEPoll();
 
 			void subscribe(int fd, EPoll::Events interestedEvents, Poco::SharedPtr<Handler> handler);
 			void unsubscribe(int fd);
 			void run();
+			void stop();
 
 			/** \brief Wait while some events on file descriptor.
 			 * 
@@ -40,6 +48,7 @@ namespace Coroutine03 {
 		private:
 			EPoll _epoll;
 			std::map<int, Poco::SharedPtr<Handler> > _handlers;
+			bool _isStarted;
 		};
 
 	} // namespace Core
