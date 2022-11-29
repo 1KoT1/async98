@@ -34,7 +34,7 @@ namespace Coroutine03 {
 			 * send it to this constructor.
 			 */
 			HandlerEPollEvents(Poco::SharedPtr<DispatcherEPoll> dispatcher, int fd, EPoll::Events interestedEvents);
-			virtual ~HandlerEPollEvents();
+			virtual ~HandlerEPollEvents() {}
 		protected:
 			Poco::SharedPtr<DispatcherEPoll> _dispatcher;
 			int _fd;

@@ -13,9 +13,5 @@ namespace Coroutine03 {
 			_dispatcher->subscribe(_fd, interestedEvents, new Delegate(*this));
 		}
 
-		HandlerEPollEvents::~HandlerEPollEvents() {
-			_dispatcher->unsubscribe(_fd);
-		}
-
 	} // namespace Core
 } // namespace Coroutine03
