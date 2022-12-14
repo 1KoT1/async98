@@ -15,6 +15,12 @@ namespace Coroutine03 {
 			TimeoutException(const std::string &message) : std::runtime_error(message) {}
 		};
 
+		/** The refference to array of bytes.
+		 *
+		 * You can get the pointer to data and size of the array.
+		 * This class doesn't owns of the array but only provides
+		 * an access to.
+		 **/
 		class BufferRef {
 		public:
 			BufferRef(char *data, size_t size) : _data(data), _size(size) {}
@@ -33,13 +39,23 @@ namespace Coroutine03 {
 
 			void connect(const Poco::Net::SocketAddress &address);
 			void bind(const Poco::Net::SocketAddress &address);
-			void send(const BufferRef &buffer, Core::Timeout timeout);
-			void recv(BufferRef &bufferForRecv, Core::Timeout timeout);
+			void send(const void *buffer, size_t size, Core::Timeout timeout);
+			void send(const void *buffer, size_t size);
+			void sendTo(const void *buffer, size_t size, const Poco::Net::SocketAddress &address, Core::Timeout timeout);
+			void sendTo(const void *buffer, size_t size, const Poco::Net::SocketAddress &address);
+			ssize_t recv(void *bufferForRecv, size_t size, Core::Timeout timeout);
+			ssize_t recv(void *bufferForRecv, size_t size);
 
+			/** The event when new UDP packet is received.
+			 *
+			 * Handlers will be called in syncon way. The argumetn is a reference to the
+			 * udp paccket data. This reference is valid while handler is executing. It
+			 * will be invalid after the handler will return.
+			 **/
 			Poco::BasicEvent<const BufferRef> packetReceived;
 
 		protected:
-			void handler(Core::EPoll::Events events);
+			void handle(Core::EPoll::Events events);
 		private:
 			char *_buf;
 			size_t _bufSize;
