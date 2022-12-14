@@ -11,7 +11,6 @@ add_library(coroutine03
 	src/Coroutine03/Core/DispatcherEPoll.cpp
 	src/Coroutine03/Core/EPoll.cpp
 	src/Coroutine03/Core/HandlerEPollEvents.cpp
-	src/Coroutine03/Core/SocketUdp.cpp
 	src/Coroutine03/Core/StopBySignals.cpp
 	)
 

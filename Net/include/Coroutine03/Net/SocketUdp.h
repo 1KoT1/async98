@@ -8,7 +8,7 @@
 #include <string>
 
 namespace Coroutine03 {
-	namespace Core {
+	namespace Net {
 
 		class TimeoutException : std::runtime_error {
 		public:
@@ -26,20 +26,20 @@ namespace Coroutine03 {
 			size_t _size;
 		};
 
-		class SocketUdp : public HandlerEPollEvents {
+		class SocketUdp : public Core::HandlerEPollEvents {
 		public:
-			SocketUdp(Poco::SharedPtr<DispatcherEPoll> dispatcher, size_t bufSize = 1024);
+			SocketUdp(Poco::SharedPtr<Core::DispatcherEPoll> dispatcher, size_t bufSize = 1024);
 			~SocketUdp();
 
 			void connect(const Poco::Net::SocketAddress &address);
 			void bind(const Poco::Net::SocketAddress &address);
-			void send(const BufferRef &buffer, Timeout timeout);
-			void recv(BufferRef &bufferForRecv, Timeout timeout);
+			void send(const BufferRef &buffer, Core::Timeout timeout);
+			void recv(BufferRef &bufferForRecv, Core::Timeout timeout);
 
 			Poco::BasicEvent<const BufferRef> packetReceived;
 
 		protected:
-			void handler(EPoll::Events events);
+			void handler(Core::EPoll::Events events);
 		private:
 			char *_buf;
 			size_t _bufSize;
@@ -49,7 +49,7 @@ namespace Coroutine03 {
 			SocketUdp &operator=(const SocketUdp &);
 		};
 
-	} // namespace Core
+	} // namespace Net
 } // namespace Coroutine03
 
 #endif // SOCKETUDP_H
