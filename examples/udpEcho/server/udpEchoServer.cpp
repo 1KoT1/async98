@@ -5,14 +5,16 @@
 #include <Coroutine03/Net/SocketUdp.h>
 #include <Poco/Net/SocketAddress.h>
 #include <Poco/SharedPtr.h>
+#include <iostream>
 #include <string>
 
-using Poco::Net::SocketAddress;
+using Coroutine03::Core::CanceledException;
 using Coroutine03::Core::Cin;
 using Coroutine03::Core::Cout;
 using Coroutine03::Core::DispatcherEPoll;
 using Coroutine03::Core::StopBySignals;
 using Coroutine03::Net::SocketUdp;
+using Poco::Net::SocketAddress;
 using Poco::SharedPtr;
 using std::endl;
 using std::string;
@@ -45,7 +47,7 @@ int main() {
 			size_t n = udpServer.recv(echoBuff, BUFF_SIZE);
 			udpServer.sendTo(echoBuff, n, clientAddress);
 		}
-	} catch(const DispatcherEPoll::CanceledException &ex) {
+	} catch(const CanceledException &ex) {
 		return 0;
 	}
 	return 1;

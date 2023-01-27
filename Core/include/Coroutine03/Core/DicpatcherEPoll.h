@@ -1,11 +1,12 @@
 #ifndef DICPATCHEREPOLL_H
 #define DICPATCHEREPOLL_H
 
+#include "Coroutine03/Core/CanceledException.h"
 #include "Coroutine03/Core/Timeout.h"
 #include "EPoll.h"
-#include <Poco/SharedPtr.h>
 #include <map>
 #include <Poco/Optional.h>
+#include <Poco/SharedPtr.h>
 #include <stdexcept>
 
 namespace Coroutine03 {
@@ -17,10 +18,6 @@ namespace Coroutine03 {
 			public:
 				virtual void run(EPoll::Events events) = 0;
 				virtual ~Handler(){}
-			};
-			class CanceledException : public std::runtime_error {
-			public:
-				CanceledException() : std::runtime_error("The events dispatcher was stopped.") {}
 			};
 
 			DispatcherEPoll();

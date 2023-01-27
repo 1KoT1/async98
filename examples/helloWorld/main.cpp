@@ -7,6 +7,7 @@
 #include <Poco/SharedPtr.h>
 #include <string>
 
+using Coroutine03::Core::CanceledException;
 using Coroutine03::Core::Cin;
 using Coroutine03::Core::Cout;
 using Coroutine03::Core::DispatcherEPoll;
@@ -25,7 +26,7 @@ int main() {
 		string name;
 		cin >> name;
 		cout << "Hello " << name << "!" << endl;
-	} catch(const DispatcherEPoll::CanceledException &ex) {
+	} catch(const CanceledException &ex) {
 		std::cout << "Stop: " << ex.what() << endl;
 	}
 	return 0;

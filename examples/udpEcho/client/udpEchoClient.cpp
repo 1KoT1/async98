@@ -7,12 +7,13 @@
 #include <Poco/SharedPtr.h>
 #include <string>
 
-using Poco::Net::SocketAddress;
+using Coroutine03::Core::CanceledException;
 using Coroutine03::Core::Cin;
 using Coroutine03::Core::Cout;
 using Coroutine03::Core::DispatcherEPoll;
 using Coroutine03::Core::StopBySignals;
 using Coroutine03::Net::SocketUdp;
+using Poco::Net::SocketAddress;
 using Poco::SharedPtr;
 using std::endl;
 using std::string;
@@ -49,7 +50,7 @@ int main() {
 			size_t n = udpClient.recv(echoBuff, BUFF_SIZE);
 			cout << "Echo: " << string(echoBuff, n) << endl;
 		}
-	} catch(const DispatcherEPoll::CanceledException &ex) {
+	} catch(const CanceledException &ex) {
 		return 0;
 	}
 	return 1;
