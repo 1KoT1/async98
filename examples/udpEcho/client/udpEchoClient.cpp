@@ -31,8 +31,9 @@ int main() {
 	try {
 		SharedPtr<DispatcherEPoll> dispatcher = new DispatcherEPoll();
 		StopBySignals appExit(dispatcher);
-		Cin cin(dispatcher);
 		Cout cout(dispatcher);
+		Cin cin(dispatcher);
+		cin.tie(&cout);
 		SocketUdp udpClient(dispatcher);
 		cout << "Enter server address: " << endl;
 		SocketAddress serverAddress;

@@ -30,9 +30,6 @@ namespace Coroutine03 {
 				{
 					Base::setp(_buffer, _buffer + StdOutBufferSize);
 				}
-				~StdOutBuf() {
-					sync();
-				}
 			protected:
 				virtual int_type overflow(int_type c = traits_type::eof()) {
 					std::streamsize n = StdOutBufferSize;
