@@ -1,15 +1,15 @@
 #ifndef DICPATCHEREPOLL_H
 #define DICPATCHEREPOLL_H
 
-#include "Coroutine03/Core/CanceledException.h"
-#include "Coroutine03/Core/Timeout.h"
+#include "Asynch98/Core/CanceledException.h"
+#include "Asynch98/Core/Timeout.h"
 #include "EPoll.h"
 #include <map>
 #include <Poco/Optional.h>
 #include <Poco/SharedPtr.h>
 #include <stdexcept>
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		class DispatcherEPoll {
@@ -49,5 +49,5 @@ namespace Coroutine03 {
 		};
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 #endif // DICPATCHEREPOLL_H

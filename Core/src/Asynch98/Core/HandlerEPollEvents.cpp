@@ -1,9 +1,9 @@
-#include "Coroutine03/Core/HandlerEPollEvents.h"
+#include "Asynch98/Core/HandlerEPollEvents.h"
 #include <Poco/SharedPtr.h>
 
 using Poco::SharedPtr;
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		HandlerEPollEvents::HandlerEPollEvents(SharedPtr<DispatcherEPoll> dispatcher, int fd, EPoll::Events interestedEvents)
@@ -14,4 +14,4 @@ namespace Coroutine03 {
 		}
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98

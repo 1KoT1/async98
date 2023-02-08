@@ -1,17 +1,17 @@
-#include <Coroutine03/Core/Cin.h>
-#include <Coroutine03/Core/Cout.h>
-#include <Coroutine03/Core/DicpatcherEPoll.h>
-#include "Coroutine03/Core/StopBySignals.h"
+#include <Asynch98/Core/Cin.h>
+#include <Asynch98/Core/Cout.h>
+#include <Asynch98/Core/DicpatcherEPoll.h>
+#include "Asynch98/Core/StopBySignals.h"
 #include <exception>
 #include <iostream>
 #include <Poco/SharedPtr.h>
 #include <string>
 
-using Coroutine03::Core::CanceledException;
-using Coroutine03::Core::Cin;
-using Coroutine03::Core::Cout;
-using Coroutine03::Core::DispatcherEPoll;
-using Coroutine03::Core::StopBySignals;
+using Asynch98::Core::CanceledException;
+using Asynch98::Core::Cin;
+using Asynch98::Core::Cout;
+using Asynch98::Core::DispatcherEPoll;
+using Asynch98::Core::StopBySignals;
 using Poco::SharedPtr;
 using std::endl;
 using std::string;

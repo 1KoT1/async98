@@ -2,12 +2,12 @@
 #define CANCELEDEXCEPTION_H
 #include <stdexcept>
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 		class CanceledException : public std::runtime_error {
 		public:
 			CanceledException();
 		};
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 #endif // CANCELEDEXCEPTION_H

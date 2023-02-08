@@ -1,13 +1,13 @@
 #ifndef STOPBYSIGNALS_H
 #define STOPBYSIGNALS_H
 
-#include "Coroutine03/Core/HandlerEPollEvents.h"
+#include "Asynch98/Core/HandlerEPollEvents.h"
 #include <Poco/SharedPtr.h>
 #include <stdexcept>
 
 namespace Poco { class Logger; }
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		class StopBySignals : public HandlerEPollEvents {
@@ -29,5 +29,5 @@ namespace Coroutine03 {
 		};
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 #endif // STOPBYSIGNALS_H

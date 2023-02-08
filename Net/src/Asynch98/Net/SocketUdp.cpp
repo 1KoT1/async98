@@ -1,7 +1,7 @@
-#include "Coroutine03/Net/SocketUdp.h"
-#include "Coroutine03/Core/DicpatcherEPoll.h"
-#include "Coroutine03/Core/EPoll.h"
-#include "Coroutine03/Core/Timeout.h"
+#include "Asynch98/Net/SocketUdp.h"
+#include "Asynch98/Core/DicpatcherEPoll.h"
+#include "Asynch98/Core/EPoll.h"
+#include "Asynch98/Core/Timeout.h"
 #include <Poco/Format.h>
 #include <Poco/Net/SocketAddress.h>
 #include <Poco/Optional.h>
@@ -11,9 +11,9 @@
 #include <sys/socket.h>
 #include <sys/epoll.h>
 
-using Coroutine03::Core::DispatcherEPoll;
-using Coroutine03::Core::EPoll;
-using Coroutine03::Core::Timeout;
+using Asynch98::Core::DispatcherEPoll;
+using Asynch98::Core::EPoll;
+using Asynch98::Core::Timeout;
 using Poco::format;
 using Poco::Net::SocketAddress;
 using Poco::Net::SocketAddress;
@@ -21,7 +21,7 @@ using Poco::SharedPtr;
 using std::runtime_error;
 using std::string;
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Net {
 
 		const int NO_FLAGS = 0;
@@ -180,5 +180,5 @@ namespace Coroutine03 {
 		}
 
 	} // namespace Net
-} // namespace Coroutine03
+} // namespace Asynch98
 

@@ -1,14 +1,14 @@
 #ifndef CIN_H
 #define CIN_H
 
-#include "Coroutine03/Core/DicpatcherEPoll.h"
-#include "Coroutine03/Core/HandlerEPollEvents.h"
+#include "Asynch98/Core/DicpatcherEPoll.h"
+#include "Asynch98/Core/HandlerEPollEvents.h"
 #include <istream>
 #include <Poco/SharedPtr.h>
 #include <streambuf>
 #include <unistd.h>
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		/** @breif Implementation of std::basic_streambuf for make quals std::cin which works with Coroutnes03::Coro::DispatcherEPoll
@@ -45,7 +45,7 @@ namespace Coroutine03 {
 				}
 
 				/** Doesn't handle events because implementation of std::basic_streambuf only need "blocking" mwthod wait(...).*/
-				void handle(Coroutine03::Core::EPoll::Events) {}
+				void handle(Asynch98::Core::EPoll::Events) {}
 			private:
 				CharT _buffer[StdInBufferSize];
 			};
@@ -65,5 +65,5 @@ namespace Coroutine03 {
 		};
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 #endif // CIN_H

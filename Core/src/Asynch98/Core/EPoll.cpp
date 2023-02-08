@@ -1,4 +1,4 @@
-#include "Coroutine03/Core/EPoll.h"
+#include "Asynch98/Core/EPoll.h"
 #include <cstring>
 #include <Poco/Format.h>
 #include <Poco/Logger.h>
@@ -9,7 +9,7 @@ using Poco::format;
 using Poco::Logger;
 using std::string;
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		EPoll::EPoll()
@@ -76,4 +76,4 @@ namespace Coroutine03 {
 		}
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98

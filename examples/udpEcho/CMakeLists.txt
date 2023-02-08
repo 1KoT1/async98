@@ -7,13 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Poco 1.7.2 REQUIRED Foundation)
 
-if(NOT DEFINED coroutine03_SOURCE_DIR)
-	add_subdirectory(../../Core ${CMAKE_BINARY_DIR}/coroutine03 EXCLUDE_FROM_ALL)
-endif(NOT DEFINED coroutine03_SOURCE_DIR)
+if(NOT DEFINED asynch98_SOURCE_DIR)
+	add_subdirectory(../../Core ${CMAKE_BINARY_DIR}/asynch98 EXCLUDE_FROM_ALL)
+endif(NOT DEFINED asynch98_SOURCE_DIR)
 
-if(NOT DEFINED coroutine03Net_SOURCE_DIR)
-	add_subdirectory(../../Net ${CMAKE_BINARY_DIR}/coroutine03Net EXCLUDE_FROM_ALL)
-endif(NOT DEFINED coroutine03Net_SOURCE_DIR)
+if(NOT DEFINED asynch98Net_SOURCE_DIR)
+	add_subdirectory(../../Net ${CMAKE_BINARY_DIR}/asynch98Net EXCLUDE_FROM_ALL)
+endif(NOT DEFINED asynch98Net_SOURCE_DIR)
 
 add_executable(udpEchoServer
 	server/udpEchoServer.cpp
@@ -25,8 +25,8 @@ target_include_directories(udpEchoServer PUBLIC
 
 target_link_libraries(udpEchoServer PUBLIC
 	Poco::Foundation
-	coroutine03
-	coroutine03Net
+	asynch98
+	asynch98Net
 	)
 
 add_executable(udpEchoClient
@@ -39,6 +39,6 @@ target_include_directories(udpEchoClient PUBLIC
 
 target_link_libraries(udpEchoClient PUBLIC
 	Poco::Foundation
-	coroutine03
-	coroutine03Net
+	asynch98
+	asynch98Net
 	)

@@ -1,4 +1,4 @@
-#include "Coroutine03/Core/StopBySignals.h"
+#include "Asynch98/Core/StopBySignals.h"
 #include <csignal>
 #include <cstring>
 #include <Poco/Format.h>
@@ -13,7 +13,7 @@ using Poco::SharedPtr;
 using std::runtime_error;
 using std::string;
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		const int CREATE_NEW = -1;
@@ -72,4 +72,4 @@ namespace Coroutine03 {
 		{}
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98

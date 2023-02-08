@@ -1,13 +1,13 @@
 #ifndef SOCKETUDP_H
 #define SOCKETUDP_H
 
-#include "Coroutine03/Core/HandlerEPollEvents.h"
+#include "Asynch98/Core/HandlerEPollEvents.h"
 #include "Poco/BasicEvent.h"
 #include <Poco/Net/SocketAddress.h>
 #include <stdexcept>
 #include <string>
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Net {
 
 		class TimeoutException : std::runtime_error {
@@ -66,6 +66,6 @@ namespace Coroutine03 {
 		};
 
 	} // namespace Net
-} // namespace Coroutine03
+} // namespace Asynch98
 
 #endif // SOCKETUDP_H

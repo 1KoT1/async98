@@ -4,7 +4,7 @@
 #include <Poco/Timespan.h>
 #include <stdexcept>
 
-namespace Coroutine03 {
+namespace Asynch98 {
 namespace Core {
 
 	class Timeout : public Poco::Timespan {
@@ -31,6 +31,6 @@ namespace Core {
 	};
 
 } // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 
 #endif // TIMEOUT_H

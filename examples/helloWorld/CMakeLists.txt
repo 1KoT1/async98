@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Poco 1.7.2 REQUIRED Foundation)
 
 if(NOT DEFINED libpoco_gtest_SOURCE_DIR)
-	add_subdirectory(../../Core ${CMAKE_BINARY_DIR}/coroutine03 EXCLUDE_FROM_ALL)
+	add_subdirectory(../../Core ${CMAKE_BINARY_DIR}/asynch98 EXCLUDE_FROM_ALL)
 endif(NOT DEFINED libpoco_gtest_SOURCE_DIR)
 
 add_executable(helloWorld
@@ -21,5 +21,5 @@ target_include_directories(helloWorld PUBLIC
 
 target_link_libraries(helloWorld PUBLIC
 	Poco::Foundation
-	coroutine03
+	asynch98
 	)

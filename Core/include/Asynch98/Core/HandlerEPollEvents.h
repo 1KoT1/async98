@@ -1,11 +1,11 @@
 #ifndef HANDLEREPOLLEVENTS_H
 #define HANDLEREPOLLEVENTS_H
 
-#include "Coroutine03/Core/EPoll.h"
-#include "Coroutine03/Core/DicpatcherEPoll.h"
+#include "Asynch98/Core/EPoll.h"
+#include "Asynch98/Core/DicpatcherEPoll.h"
 #include <Poco/SharedPtr.h>
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		/** \brief Base class for any IO classes.
@@ -57,6 +57,6 @@ namespace Coroutine03 {
 		};
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 
 #endif // HANDLEREPOLLEVENTS_H

@@ -1,4 +1,4 @@
-#include "Coroutine03/Core/DicpatcherEPoll.h"
+#include "Asynch98/Core/DicpatcherEPoll.h"
 #include <Poco/SharedPtr.h>
 #include <Poco/Timespan.h>
 #include <Poco/Timestamp.h>
@@ -10,7 +10,7 @@ using Poco::Timespan;
 using Poco::Timestamp;
 using std::string;
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		DispatcherEPoll::DispatcherEPoll()
@@ -97,4 +97,4 @@ namespace Coroutine03 {
 		}
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98

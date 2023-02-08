@@ -1,14 +1,14 @@
 #ifndef SOURCEEPOLL_H
 #define SOURCEEPOLL_H
 
-#include "Coroutine03/Core/Timeout.h"
+#include "Asynch98/Core/Timeout.h"
 #include <exception>
 #include <stdexcept>
 #include <sys/epoll.h>
 
 namespace Poco { class Logger; }
 
-namespace Coroutine03 {
+namespace Asynch98 {
 	namespace Core {
 
 		/** Wrapper for linux epoll api.
@@ -46,7 +46,7 @@ namespace Coroutine03 {
 		};
 
 	} // namespace Core
-} // namespace Coroutine03
+} // namespace Asynch98
 
 
 #endif // SOURCEEPOLL_H
