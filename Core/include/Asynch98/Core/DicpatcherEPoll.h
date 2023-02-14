@@ -16,13 +16,15 @@ namespace Asynch98 {
 		public:
 			class Handler {
 			public:
-				virtual void run(EPoll::Events events) = 0;
+				virtual void run(EPoll::Events events) const = 0;
 				virtual ~Handler(){}
 			};
 
 			DispatcherEPoll();
 
 			void subscribe(int fd, EPoll::Events interestedEvents, Poco::SharedPtr<Handler> handler);
+			void modSubscription(int fd, EPoll::Events interestedEvents, Poco::SharedPtr<Handler> handler);
+			void modSubscription(int fd, EPoll::Events interestedEvents);
 			void unsubscribe(int fd);
 			void run();
 			void stop();
@@ -39,8 +41,8 @@ namespace Asynch98 {
 			 * \return Flags of happened events or 0 on timeout.
 			 * @{
 			 */
-			EPoll::Events wait(int currentFd, EPoll::Events eventsMask, Timeout timeout);
-			EPoll::Events wait(int currentFd, EPoll::Events eventsMask);
+			EPoll::Events wait(int currentFd, EPoll::Events eventsMask, Timeout timeout) const;
+			EPoll::Events wait(int currentFd, EPoll::Events eventsMask) const;
 			/** @} */
 		private:
 			EPoll _epoll;

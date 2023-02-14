@@ -24,6 +24,15 @@ namespace Asynch98 {
 			_epoll.add(fd, interestedEvents);
 		}
 
+		void DispatcherEPoll::modSubscription(int fd, EPoll::Events interestedEvents, SharedPtr<Handler> handler) {
+			_epoll.mod(fd, interestedEvents);
+			_handlers[fd] = handler;
+		}
+
+		void DispatcherEPoll::modSubscription(int fd, EPoll::Events interestedEvents) {
+			_epoll.mod(fd, interestedEvents);
+		}
+
 		void DispatcherEPoll::unsubscribe(int fd) {
 			_handlers.erase(fd);
 			_epoll.del(fd);
@@ -46,7 +55,7 @@ namespace Asynch98 {
 			return Timestamp(); // Current time;
 		}
 
-		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask, Timeout timeout) {
+		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask, Timeout timeout) const {
 			struct epoll_event events[MAX_EVENTS];
 			Timestamp startTime; // Current time.
 			for(Timespan nextTimeout = timeout; nextTimeout > 0; nextTimeout -= (now() - startTime)) {
@@ -65,7 +74,7 @@ namespace Asynch98 {
 				}
 
 				for(int i = 0; i < happened; ++i) {
-					_handlers[events[i].data.fd]->run(events[i].events);
+					_handlers.at(events[i].data.fd)->run(events[i].events);
 					if(!_isStarted) {
 						throw CanceledException();
 					}
@@ -74,7 +83,7 @@ namespace Asynch98 {
 			return 0; // Timedout
 		}
 
-		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask) {
+		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask) const {
 			struct epoll_event events[MAX_EVENTS];
 			while(true) {
 				int happened = _epoll.wait(events, MAX_EVENTS);
@@ -88,7 +97,7 @@ namespace Asynch98 {
 				}
 
 				for(int i = 0; i < happened; ++i) {
-					_handlers[events[i].data.fd]->run(events[i].events);
+					_handlers.at(events[i].data.fd)->run(events[i].events);
 					if(!_isStarted) {
 						throw CanceledException();
 					}

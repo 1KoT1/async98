@@ -13,6 +13,7 @@ endif(NOT DEFINED asynch98_SOURCE_DIR)
 
 add_library(asynch98Net
 	src/Asynch98/Net/SocketUdp.cpp
+	src/Asynch98/Net/SocketTcp.cpp
 	)
 
 target_include_directories(asynch98Net PUBLIC

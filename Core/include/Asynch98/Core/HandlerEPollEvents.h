@@ -47,7 +47,7 @@ namespace Asynch98 {
 			class Delegate : public DispatcherEPoll::Handler {
 			public:
 				Delegate(HandlerEPollEvents &h) : _h(h) {}
-				void run(EPoll::Events events) { _h.handle(events); }
+				void run(EPoll::Events events) const { _h.handle(events); }
 
 				Delegate(const Delegate &other) : _h(other._h) {}
 				Delegate &operator=(const Delegate &other) { _h = other._h; return *this; }

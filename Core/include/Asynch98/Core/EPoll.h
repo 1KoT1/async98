@@ -25,8 +25,8 @@ namespace Asynch98 {
 			~EPoll();
 
 
-			int wait(struct epoll_event *events, int maxevents, Timeout timeout);
-			int wait(struct epoll_event *events, int maxevents);
+			int wait(struct epoll_event *events, int maxevents, Timeout timeout) const;
+			int wait(struct epoll_event *events, int maxevents) const;
 
 			void add(int fd, int events);
 			void del(int fd);

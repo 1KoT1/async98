@@ -29,7 +29,7 @@ namespace Asynch98 {
 			}
 		}
 
-		int EPoll::wait(struct epoll_event *events, int maxevents, Timeout timeout) {
+		int EPoll::wait(struct epoll_event *events, int maxevents, Timeout timeout) const {
 			int n = epoll_wait(_epollFd, events, maxevents, timeout.totalMilliseconds());
 			if(n == -1) {
 				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
@@ -39,7 +39,7 @@ namespace Asynch98 {
 
 		const int INFINITE = -1;
 
-		int EPoll::wait(struct epoll_event *events, int maxevents) {
+		int EPoll::wait(struct epoll_event *events, int maxevents) const {
 			int n = epoll_wait(_epollFd, events, maxevents, INFINITE);
 			if(n == -1) {
 				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
