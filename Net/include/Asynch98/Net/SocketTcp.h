@@ -2,6 +2,7 @@
 #define SOCKETTCP_H
 
 #include "Asynch98/Core/HandlerEPollEvents.h"
+#include "Asynch98/Core/Timeout.h"
 #include "Poco/BasicEvent.h"
 #include <Poco/Net/SocketAddress.h>
 #include <Poco/SharedPtr.h>
@@ -43,18 +44,16 @@ namespace Asynch98 {
 			SocketTcp(Poco::SharedPtr<Core::DispatcherEPoll> dispatcher, size_t bufSize = 1024);
 			~SocketTcp();
 
-			void connect(const Poco::Net::SocketAddress &address);
+			void connect(const Poco::Net::SocketAddress &address, Core::TimeoutInMilliseconds timeout = Core::INFINITE);
 			void bind(const Poco::Net::SocketAddress &address);
 			void listen(int backlog = 4096);
 			struct acceptResult {
 				Poco::Net::SocketAddress addressOfIncoming;
 				Poco::SharedPtr<SocketTcp> newSocket;
 			};
-			acceptResult accept() const;
-			void send(const void *buffer, size_t size, Core::Timeout timeout);
-			void send(const void *buffer, size_t size);
-			ssize_t recv(void *bufferForRecv, size_t size, Core::Timeout timeout);
-			ssize_t recv(void *bufferForRecv, size_t size);
+			acceptResult accept(Core::TimeoutInMilliseconds timeout = Core::INFINITE) const;
+			void send(const void *buffer, size_t size, Core::TimeoutInMilliseconds timeout = Core::INFINITE);
+			ssize_t recv(void *bufferForRecv, size_t size, Core::TimeoutInMilliseconds timeout = Core::INFINITE);
 
 			/** The event when new TCP packet is received.
 			 *

@@ -29,23 +29,10 @@ namespace Asynch98 {
 			}
 		}
 
-		int EPoll::wait(struct epoll_event *events, int maxevents, Timeout timeout) const {
-			int n = epoll_wait(_epollFd, events, maxevents, timeout.totalMilliseconds());
+		int EPoll::wait(struct epoll_event *events, int maxevents, TimeoutInMilliseconds timeout) const {
+			int n = epoll_wait(_epollFd, events, maxevents, timeout);
 			if(n == -1) {
 				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-			}
-			return n;
-		}
-
-		const int INFINITE = -1;
-
-		int EPoll::wait(struct epoll_event *events, int maxevents) const {
-			int n = epoll_wait(_epollFd, events, maxevents, INFINITE);
-			if(n == -1) {
-				throw EPollFailException(format("Fail of the epoll_wait method. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-			}
-			if(n == 0) {
-				throw EPollFailException("Fail of the epoll_wait method: Unexpected elapse timeout.");
 			}
 			return n;
 		}

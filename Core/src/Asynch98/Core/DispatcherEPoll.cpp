@@ -2,6 +2,7 @@
 #include <Poco/SharedPtr.h>
 #include <Poco/Timespan.h>
 #include <Poco/Timestamp.h>
+#include <stdexcept>
 #include <string>
 
 using Poco::Optional;
@@ -55,10 +56,45 @@ namespace Asynch98 {
 			return Timestamp(); // Current time;
 		}
 
-		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask, Timeout timeout) const {
+		TimeoutInMilliseconds toMilliseconds(Timestamp::TimeDiff value) {
+			return Timespan(value).totalMilliseconds();
+		}
+
+		class TimeoutStrategy {
+		public:
+			virtual TimeoutInMilliseconds nextTimeout() = 0;
+			virtual bool inProgress() const = 0;
+		};
+		class TimeoutStrategyInfinite : public TimeoutStrategy {
+		public:
+			TimeoutInMilliseconds nextTimeout() { return INFINITE; }
+			bool inProgress() const { return true; }
+		};
+		class TimeoutStrategyDecrement : public TimeoutStrategy {
+		public:
+			TimeoutStrategyDecrement(TimeoutInMilliseconds timeout)
+				: _startTime(now())
+				, _timeout(timeout)
+			{
+				if(_timeout < 0) throw std::logic_error("Timeout MUST be better 0");
+			}
+			TimeoutInMilliseconds nextTimeout() {
+				return _timeout -= toMilliseconds(now() - _startTime);
+			}
+			bool inProgress() const {
+				return _timeout > 0;
+			}
+		private:
+			Timestamp _startTime;
+			TimeoutInMilliseconds _timeout;
+		};
+
+		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask, TimeoutInMilliseconds timeout) const {
 			struct epoll_event events[MAX_EVENTS];
-			Timestamp startTime; // Current time.
-			for(Timespan nextTimeout = timeout; nextTimeout > 0; nextTimeout -= (now() - startTime)) {
+			SharedPtr<TimeoutStrategy> timeoutStrategy = (timeout == INFINITE)
+				? SharedPtr<TimeoutStrategy>(new TimeoutStrategyInfinite)
+				: new TimeoutStrategyDecrement(timeout);
+			for(TimeoutInMilliseconds nextTimeout = timeoutStrategy->nextTimeout(); timeoutStrategy->inProgress(); nextTimeout = timeoutStrategy->nextTimeout()) {
 				int happened = _epoll.wait(events, MAX_EVENTS, nextTimeout);
 				if(!_isStarted) {
 					throw CanceledException();
@@ -81,28 +117,6 @@ namespace Asynch98 {
 				}
 			}
 			return 0; // Timedout
-		}
-
-		EPoll::Events DispatcherEPoll::wait(int currentFd, EPoll::Events eventsMask) const {
-			struct epoll_event events[MAX_EVENTS];
-			while(true) {
-				int happened = _epoll.wait(events, MAX_EVENTS);
-				if(!_isStarted) {
-					throw CanceledException();
-				}
-
-				Optional<EPoll::Events> eventsForCurrent = find(events, happened, currentFd, eventsMask);
-				if(eventsForCurrent.isSpecified()) {
-					return eventsForCurrent.value();
-				}
-
-				for(int i = 0; i < happened; ++i) {
-					_handlers.at(events[i].data.fd)->run(events[i].events);
-					if(!_isStarted) {
-						throw CanceledException();
-					}
-				}
-			}
 		}
 
 	} // namespace Core

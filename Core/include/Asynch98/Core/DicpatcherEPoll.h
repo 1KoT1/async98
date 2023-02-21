@@ -39,11 +39,8 @@ namespace Asynch98 {
 			 * \param eventMask is filter for events on interested fd. Exit only for events are matched by this mask.
 			 * \param timeout is time for wait events. If time is spended exit with 0 value.
 			 * \return Flags of happened events or 0 on timeout.
-			 * @{
 			 */
-			EPoll::Events wait(int currentFd, EPoll::Events eventsMask, Timeout timeout) const;
-			EPoll::Events wait(int currentFd, EPoll::Events eventsMask) const;
-			/** @} */
+			EPoll::Events wait(int currentFd, EPoll::Events eventsMask, TimeoutInMilliseconds timeout = INFINITE) const;
 		private:
 			EPoll _epoll;
 			std::map<int, Poco::SharedPtr<Handler> > _handlers;

@@ -13,7 +13,7 @@
 
 using Asynch98::Core::DispatcherEPoll;
 using Asynch98::Core::EPoll;
-using Asynch98::Core::Timeout;
+using Asynch98::Core::TimeoutInMilliseconds;
 using Poco::format;
 using Poco::Net::SocketAddress;
 using Poco::Net::SocketAddress;
@@ -62,7 +62,7 @@ namespace Asynch98 {
 			}
 		}
 
-		void SocketTcp::connect(const SocketAddress &address) {
+		void SocketTcp::connect(const SocketAddress &address, TimeoutInMilliseconds timeout) {
 			int status = ::connect(_fd, address.addr(), address.length());
 			if(status == 0) {
 				return;
@@ -71,7 +71,8 @@ namespace Asynch98 {
 					_dispatcher->modSubscription(_fd, TCP_INTERESTED_EVENTS | EPOLLOUT);
 					EPoll::Events events = _dispatcher->wait(
 						_fd,
-						EPOLLOUT | EPOLLERR
+						EPOLLOUT | EPOLLERR,
+						timeout
 						);
 					_dispatcher->modSubscription(_fd, TCP_INTERESTED_EVENTS);
 					if(events & EPOLLERR) {
@@ -106,10 +107,11 @@ namespace Asynch98 {
 			}
 		}
 
-		SocketTcp::acceptResult SocketTcp::accept() const {
+		SocketTcp::acceptResult SocketTcp::accept(TimeoutInMilliseconds timeout) const {
 			EPoll::Events events = _dispatcher->wait(
 				_fd,
-				EPOLLIN | EPOLLERR
+				EPOLLIN | EPOLLERR,
+				timeout
 				);
 			sockaddr_in addr;
 			socklen_t l = sizeof(addr);
@@ -123,7 +125,7 @@ namespace Asynch98 {
 			return r;
 		}
 
-		void SocketTcp::send(const void *buffer, size_t size, Timeout timeout) {
+		void SocketTcp::send(const void *buffer, size_t size, TimeoutInMilliseconds timeout) {
 			_dispatcher->modSubscription(_fd, TCP_INTERESTED_EVENTS | EPOLLOUT);
 			EPoll::Events events = _dispatcher->wait(
 				_fd,
@@ -144,54 +146,11 @@ namespace Asynch98 {
 			}
 		}
 
-		void SocketTcp::send(const void *buffer, size_t size) {
-			_dispatcher->modSubscription(_fd, TCP_INTERESTED_EVENTS | EPOLLOUT);
-			EPoll::Events events = _dispatcher->wait(
-				_fd,
-				EPOLLOUT | EPOLLERR
-				);
-			_dispatcher->modSubscription(_fd, TCP_INTERESTED_EVENTS);
-			if(events & EPOLLERR) {
-				throw runtime_error(format("Fail of send data to tcp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-			}
-
-			int err = ::send(_fd, buffer, size, NO_FLAGS);
-			if(err == -1) {
-				throw runtime_error(format("Fail of send data to tcp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-			}
-		}
-
-		ssize_t SocketTcp::recv(void *buffer, size_t size, Timeout timeout) {
+		ssize_t SocketTcp::recv(void *buffer, size_t size, TimeoutInMilliseconds timeout) {
 			EPoll::Events events = _dispatcher->wait(
 				_fd,
 				EPOLLIN | EPOLLERR | EPOLLRDHUP,
 				timeout
-				);
-			if(events == 0) {
-				throw TimeoutException("Fail of receive data from tcp socket by timeout.");
-			}
-			if(events & EPOLLRDHUP) {
-				throw TcpClosed();
-			}
-			if(events & EPOLLERR) {
-				if(events & EPOLLHUP) {
-					throw TcpClosed();
-				}
-				throw runtime_error(format("Fail of receive data from tcp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-			}
-
-			ssize_t n = ::recv(_fd, buffer, size, NO_FLAGS);
-			if(n == -1) {
-				throw runtime_error(format("Fail of receive data from tcp socket. Errno: %d, %s", errno, string(strerror_l(errno, static_cast<locale_t>(0)))));
-			}
-
-			return n;
-		}
-
-		ssize_t SocketTcp::recv(void *buffer, size_t size) {
-			EPoll::Events events = _dispatcher->wait(
-				_fd,
-				EPOLLIN | EPOLLERR | EPOLLRDHUP
 				);
 			if(events == 0) {
 				throw TimeoutException("Fail of receive data from tcp socket by timeout.");

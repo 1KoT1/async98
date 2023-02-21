@@ -2,6 +2,7 @@
 #define SOCKETUDP_H
 
 #include "Asynch98/Core/HandlerEPollEvents.h"
+#include "Asynch98/Core/Timeout.h"
 #include "Poco/BasicEvent.h"
 #include <Poco/Net/SocketAddress.h>
 #include <stdexcept>
@@ -39,12 +40,9 @@ namespace Asynch98 {
 
 			void connect(const Poco::Net::SocketAddress &address);
 			void bind(const Poco::Net::SocketAddress &address);
-			void send(const void *buffer, size_t size, Core::Timeout timeout);
-			void send(const void *buffer, size_t size);
-			void sendTo(const void *buffer, size_t size, const Poco::Net::SocketAddress &address, Core::Timeout timeout);
-			void sendTo(const void *buffer, size_t size, const Poco::Net::SocketAddress &address);
-			ssize_t recv(void *bufferForRecv, size_t size, Core::Timeout timeout);
-			ssize_t recv(void *bufferForRecv, size_t size);
+			void send(const void *buffer, size_t size, Core::TimeoutInMilliseconds timeout = Core::INFINITE);
+			void sendTo(const void *buffer, size_t size, const Poco::Net::SocketAddress &address, Core::TimeoutInMilliseconds timeout = Core::INFINITE);
+			ssize_t recv(void *bufferForRecv, size_t size, Core::TimeoutInMilliseconds timeout = Core::INFINITE);
 
 			/** The event when new UDP packet is received.
 			 *
