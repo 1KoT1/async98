@@ -34,7 +34,7 @@ namespace Asynch98 {
 			return fd;
 		}
 
-		const int UDP_INTERESTED_EVENTS = EPOLLIN | EPOLLOUT | EPOLLERR;
+		const int UDP_INTERESTED_EVENTS = EPOLLIN | EPOLLERR;
 
 		SocketUdp::SocketUdp(SharedPtr<DispatcherEPoll> dispatcher, size_t bufSize)
 			: HandlerEPollEvents(dispatcher, createSocket(), UDP_INTERESTED_EVENTS)
@@ -71,11 +71,13 @@ namespace Asynch98 {
 		}
 
 		void SocketUdp::send(const void *buffer, size_t size, TimeoutInMilliseconds timeout) {
+			_dispatcher->modSubscription(_fd, UDP_INTERESTED_EVENTS | EPOLLOUT);
 			EPoll::Events events = _dispatcher->wait(
 				_fd,
 				EPOLLOUT | EPOLLERR,
 				timeout
 				);
+			_dispatcher->modSubscription(_fd, UDP_INTERESTED_EVENTS);
 			if(events == 0) {
 				throw TimeoutException("Fail of send data to udp socket by timeout.");
 			}
@@ -90,11 +92,13 @@ namespace Asynch98 {
 		}
 
 		void SocketUdp::sendTo(const void *buffer, size_t size, const SocketAddress &address, TimeoutInMilliseconds timeout) {
+			_dispatcher->modSubscription(_fd, UDP_INTERESTED_EVENTS | EPOLLOUT);
 			EPoll::Events events = _dispatcher->wait(
 				_fd,
 				EPOLLOUT | EPOLLERR,
 				timeout
 				);
+			_dispatcher->modSubscription(_fd, UDP_INTERESTED_EVENTS);
 			if(events == 0) {
 				throw TimeoutException("Fail of send data to udp socket by timeout.");
 			}
