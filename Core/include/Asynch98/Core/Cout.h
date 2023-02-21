@@ -26,7 +26,7 @@ namespace Asynch98 {
 			public:
 				StdOutBuf(Poco::SharedPtr<DispatcherEPoll> dispatcher) 
 					: Base() 
-					, HandlerEPollEvents(dispatcher, StdOutFD, EPOLLOUT | EPOLLERR)
+					, HandlerEPollEvents(dispatcher, StdOutFD, EPOLLERR)
 				{
 					Base::setp(_buffer, _buffer + StdOutBufferSize);
 				}
@@ -37,7 +37,9 @@ namespace Asynch98 {
 						_buffer[StdOutBufferSize] = c;
 						n = StdOutBufferSize + 1;
 					}
+					_dispatcher->modSubscription(_fd, EPOLLERR | EPOLLOUT);
 					EPoll::Events events = _dispatcher->wait(StdOutFD, EPOLLOUT | EPOLLERR);
+					_dispatcher->modSubscription(_fd, EPOLLERR);
 					if(events & EPOLLOUT) {
 						std::streamsize err = write(StdOutFD, _buffer, n);
 						if(err != -1) {
@@ -49,7 +51,9 @@ namespace Asynch98 {
 				}
 
 				virtual int sync() {
+					_dispatcher->modSubscription(_fd, EPOLLERR | EPOLLOUT);
 					EPoll::Events events = _dispatcher->wait(StdOutFD, EPOLLOUT | EPOLLERR);
+					_dispatcher->modSubscription(_fd, EPOLLERR);
 					if(events & EPOLLOUT) {
 						std::streamsize n = Base::pptr() - _buffer;
 						Base::setp(_buffer, _buffer + StdOutBufferSize);
