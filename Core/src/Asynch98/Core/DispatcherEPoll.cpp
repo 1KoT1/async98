@@ -9,6 +9,7 @@ using Poco::Optional;
 using Poco::SharedPtr;
 using Poco::Timespan;
 using Poco::Timestamp;
+using std::logic_error;
 using std::string;
 
 namespace Asynch98 {
@@ -37,6 +38,25 @@ namespace Asynch98 {
 		void DispatcherEPoll::unsubscribe(int fd) {
 			_handlers.erase(fd);
 			_epoll.del(fd);
+		}
+
+		void DispatcherEPoll::run() {
+			struct epoll_event events[MAX_EVENTS];
+			while(_isStarted) {
+				int happened = _epoll.wait(events, MAX_EVENTS, INFINITE);
+
+				if(happened == 0) {
+					throw logic_error("Unexpected timeout of epoll_wait");
+				}
+
+				for(int i = 0; i < happened; ++i) {
+					_handlers.at(events[i].data.fd)->run(events[i].events);
+					if(!_isStarted) {
+						throw CanceledException();
+					}
+				}
+			}
+			throw CanceledException();
 		}
 
 		void DispatcherEPoll::stop() {
